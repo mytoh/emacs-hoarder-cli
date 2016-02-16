@@ -18,7 +18,7 @@
               (path (hoarder:concat-path hoarder-directory (glof:get package :origin)))
               (type (glof:get package :type)))
       (when (and (cl-equalp :git type)
-                 (not (file-symlink-p path)))
+               (not (file-symlink-p path)))
         (cl-letf* ((proc-buf (get-buffer-create (format "hoarder-git-%s" (glof:get package :origin))))
                    (proc-name (format "hoarder-git-pull-%s" (glof:get package :origin))))
           (cl-labels ((sentinel-cb (process signal)
@@ -26,12 +26,11 @@
                           ((equal signal "finished\n")
                            (cl-letf ((result (with-current-buffer (process-buffer process)
                                                (buffer-substring (point-min) (point-max)))))
-                             (hoarder:message "updated package %s" name)
                              (pcase result
-                               ((pred hoarder:git-updatedp)
-                                (hoarder:message "compiling package %s" name)
-                                ;; (hoarder:message "result: %s" result)
+                               ((guard (not (hoarder:git-already-updatedp result)))
+                                (hoarder:message "updating package %s" name)
                                 (when (glof:get package :compile)
+                                  (hoarder:message "compiling package %s" name)
                                   (hoarder:option-compile package path))
                                 (hoarder:option-build package)))
                              (kill-buffer (process-buffer process))))
@@ -51,8 +50,8 @@
   (interactive)
   (cl-letf ((pkgs
              (seq-partition
-              (seq-take hoarder:*packages* 12)
-              ;; hoarder:*packages*
+              ;; (seq-take hoarder:*packages* 8)
+              hoarder:*packages*
               4)
              ))
     (seq-each
@@ -72,7 +71,7 @@
   (load "~/.emacs.d/init.d/layer/package-manager/register/init.el")
 
   (pcase (car args)
-    ((or "up" "update-async")
+    ((or "up" "update")
      (hoarder-async-update-make-process))
     ("check"
      (hoarder:check))))
