@@ -52,8 +52,7 @@
              (seq-partition
               ;; (seq-take hoarder:*packages* 8)
               hoarder:*packages*
-              4)
-             ))
+              5)))
     (seq-each
      (lambda (pkg)
        (thread-last pkg
