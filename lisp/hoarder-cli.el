@@ -43,7 +43,7 @@
             (make-process
              :name proc-name
              :buffer proc-buf
-             :command (list "git" "-C" path "pull" )
+             :command (list "git" "--no-pager" "-C" path "pull" )
              :sentinel #'sentinel-cb)))))))
 
 (cl-defun hoarder-async-update-make-process ()
