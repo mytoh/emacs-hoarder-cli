@@ -18,7 +18,7 @@
               (path (glof:get package :path))
               (type (glof:get package :type)))
       (when (and (cl-equalp :git type)
-               (not (file-symlink-p path)))
+                 (not (file-symlink-p path)))
         (cl-letf* ((proc-buf (get-buffer-create (format "hoarder-git-%s" (glof:get package :origin))))
                    (proc-name (format "hoarder-git-pull-%s" (glof:get package :origin))))
           (cl-labels ((sentinel-cb (process signal)
