@@ -67,7 +67,6 @@
                                   (hoarder:message "compiling package %s" name)
                                   (hoarder:option-compile package path))
                                 (hoarder:option-build package)))
-                             (hoarder:message name)
                              (kill-buffer (process-buffer process))))
                           (t
                            (message name)
@@ -92,7 +91,7 @@
              (seq-partition
               ;; (seq-take hoarder:*packages* 8)
               hoarder:*packages*
-              5)))
+              3)))
     (seq-each
      (lambda (pkg)
        (thread-last pkg
