@@ -4,9 +4,9 @@
 (require 'cl-generic)
 (require 'pcase)
 
-(add-to-list 'load-path (expand-file-name "~/huone/ateljee/emacs-glof"))
-(add-to-list 'load-path (expand-file-name "~/huone/ateljee/emacs-colle"))
-(add-to-list 'load-path (expand-file-name "~/huone/ateljee/emacs-hoarder"))
+(add-to-list 'load-path (expand-file-name "~/huone/ateljee/emacs-glof/lisp"))
+(add-to-list 'load-path (expand-file-name "~/huone/ateljee/emacs-colle/lisp"))
+(add-to-list 'load-path (expand-file-name "~/huone/ateljee/emacs-hoarder/lisp"))
 
 (require 'hoarder)
 (require 'glof)
