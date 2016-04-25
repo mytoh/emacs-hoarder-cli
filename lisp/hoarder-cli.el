@@ -11,6 +11,19 @@
 (require 'hoarder)
 (require 'glof)
 
+(cl-defun hoarder:should-update-package (package)
+  (cl-labels ((local-p (p)
+                (cl-equalp :local (glof:get p :type)))
+              (remote-p (p)
+                (not (local-p p)))
+              (download-p (p)
+                (glof:get p :download nil))
+              (installed-p (p)
+                (and (glof:get p :path)
+                     (file-exists-p (glof:get p :path)))))
+    (and (remote-p package)
+         (download-p package)     
+         (installed-p package))))
 
 (cl-defun hoarder:update-package-git-async-make-process (package)
   (when (glof:get package :origin)
@@ -18,7 +31,8 @@
               (path (glof:get package :path))
               (type (glof:get package :type)))
       (when (and (cl-equalp :git type)
-               (not (file-symlink-p path)))
+                 (not (file-symlink-p path))
+                 (hoarder:should-update-package package))
         (cl-letf* ((proc-buf (get-buffer-create (format "hoarder-git-%s" (glof:get package :origin))))
                    (proc-name (format "hoarder-git-pull-%s" (glof:get package :origin))))
           (cl-labels ((sentinel-cb (process signal)
@@ -52,7 +66,7 @@
               (path (glof:get package :path))
               (type (glof:get package :type)))
       (when (and (cl-equalp :hg type)
-               (not (file-symlink-p path)))
+                 (not (file-symlink-p path)))
         (cl-letf* ((proc-buf (get-buffer-create (format "hoarder-hg-%s" (glof:get package :origin))))
                    (proc-name (format "hoarder-hg-pull-%s" (glof:get package :origin))))
           (cl-labels ((sentinel-cb (process signal)
@@ -88,15 +102,17 @@
 (cl-defun hoarder-async-update-make-process ()
   (interactive)
   (cl-letf ((pkgs
-             (seq-partition
-              ;; (seq-take hoarder:*packages* 8)
-              hoarder:*packages*
-              3)))
+             ;; (seq-take hoarder:*packages* 8)
+             (seq-partition hoarder:*packages* 3)
+             ))
     (seq-each
      (lambda (pkg)
        (thread-last pkg
          (seq-map #'hoarder:update-package-async-make-process)
-         (seq-each #'accept-process-output)))
+         (seq-each
+          (lambda (proc)
+            (if proc
+                (accept-process-output proc))))))
      pkgs))
   (message "update finished"))
 
