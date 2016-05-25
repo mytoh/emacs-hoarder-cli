@@ -20,10 +20,10 @@
                 (glof:get p :download nil))
               (installed-p (p)
                 (and (glof:get p :path)
-                     (file-exists-p (glof:get p :path)))))
+                   (file-exists-p (glof:get p :path)))))
     (and (remote-p package)
-         (download-p package)     
-         (installed-p package))))
+       (download-p package)     
+       (installed-p package))))
 
 (cl-defun hoarder:update-package-git-async-make-process (package)
   (when (glof:get package :origin)
@@ -31,8 +31,8 @@
               (path (glof:get package :path))
               (type (glof:get package :type)))
       (when (and (cl-equalp :git type)
-                 (not (file-symlink-p path))
-                 (hoarder:should-update-package package))
+               (not (file-symlink-p path))
+               (hoarder:should-update-package package))
         (cl-letf* ((proc-buf (get-buffer-create (format "hoarder-git-%s" (glof:get package :origin))))
                    (proc-name (format "hoarder-git-pull-%s" (glof:get package :origin))))
           (cl-labels ((sentinel-cb (process signal)
@@ -57,7 +57,7 @@
             (make-process
              :name proc-name
              :buffer proc-buf
-             :command (list "git" "--no-pager" "-C" path "pull" )
+             :command (list "git" "--no-pager" "-C" path "pull" "--ff-only")
              :sentinel #'sentinel-cb)))))))
 
 (cl-defun hoarder:update-package-hg-async-make-process (package)
@@ -66,7 +66,7 @@
               (path (glof:get package :path))
               (type (glof:get package :type)))
       (when (and (cl-equalp :hg type)
-                 (not (file-symlink-p path)))
+               (not (file-symlink-p path)))
         (cl-letf* ((proc-buf (get-buffer-create (format "hoarder-hg-%s" (glof:get package :origin))))
                    (proc-name (format "hoarder-hg-pull-%s" (glof:get package :origin))))
           (cl-labels ((sentinel-cb (process signal)
